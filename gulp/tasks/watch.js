@@ -11,7 +11,7 @@ gulp.task('setWatch', function() {
 });
 
 gulp.task('watch', ['setWatch', 'browserSync'], function() {
-  gulp.watch(config.stylus.src,   ['stylus']);
+  gulp.watch(config.stylus.watchSrc,   ['stylus']);
   gulp.watch(config.css.src,   ['css']);
   gulp.watch(config.images.src, ['images']);
   gulp.watch(config.markup.src, ['markup']);

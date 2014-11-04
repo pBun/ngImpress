@@ -25,7 +25,8 @@ module.exports = {
     dest: dest
   },
   stylus: {
-    src: src + "/styles/*.styl",
+    watchSrc: [src + "/styles/*.styl"],
+    src: [src + "/styles/*.styl", '!' + src + '/styles/_*.styl'],
     dest: dest
   },
   assets: {
