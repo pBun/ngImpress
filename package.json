@@ -7,7 +7,7 @@
     "url": "git://github.com/pBun/gulp-starter.git"
   },
   "browser": {
-    "impress": "./src/javascript/vendor/impress.js"
+
   },
   "browserify": {
     "transform": [
@@ -15,9 +15,7 @@
     ]
   },
   "browserify-shim": {
-    "impress": {
-      "exports": "impress"
-    }
+
   },
   "dependencies": {
     "angular": "~1.2.19",

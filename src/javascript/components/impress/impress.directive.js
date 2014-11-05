@@ -1,24 +1,20 @@
 var angular = require('angular');
 var controller = require('./impress.controller');
-var template = require('./impressSlide.html');
 
 var directive = function($window) {
   return {
     restrict: 'EA',
-    require: '^impress',
     scope: {
-      'headline': '=',
-      'currentState': '=',
-      'states': '='
+
     },
+    controller: controller,
     link: function(scope, element, attrs, ctrl) {
-      ctrl.updateState();
+      scope.root = element;
     },
-    replace: true,
-    template: template
+    transclude: true
   };
 };
 directive.$inject = ['$window'];
-directive.DIRECTIVE_NAME = 'impressSlide';
+directive.DIRECTIVE_NAME = 'impress';
 
 module.exports = directive;
