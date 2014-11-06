@@ -32,25 +32,17 @@ service.prototype.checkSupport = function() {
 
   var ua = this.window.navigator.userAgent.toLowerCase();
   var impressSupported =
-                        // browser should support CSS 3D transtorms
-                         ( this.pfx("perspective") !== null ) &&
+    // browser should support CSS 3D transtorms
+     ( this.pfx("perspective") !== null ) &&
 
-                        // and `classList` and `dataset` APIs
-                         ( body.classList ) &&
-                         ( body.dataset ) &&
+    // and `classList` and `dataset` APIs
+     ( body.classList ) &&
+     ( body.dataset ) &&
 
-                        // but some mobile devices need to be blacklisted,
-                        // because their CSS 3D support or hardware is not
-                        // good enough to run impress.js properly, sorry...
-                         ( ua.search(/(iphone)|(ipod)|(android)/) === -1 );
-
-  if (!impressSupported) {
-      // we can't be sure that `classList` is supported
-      body.className += " impress-not-supported ";
-  } else {
-      body.classList.remove("impress-not-supported");
-      body.classList.add("impress-supported");
-  }
+    // but some mobile devices need to be blacklisted,
+    // because their CSS 3D support or hardware is not
+    // good enough to run impress.js properly, sorry...
+     ( ua.search(/(iphone)|(ipod)|(android)/) === -1 );
 
   return impressSupported;
 };
