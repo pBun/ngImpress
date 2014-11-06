@@ -1,10 +1,10 @@
 {
-  "name": "gulp-starter",
+  "name": "ngImpress",
   "version": "2.0.0",
-  "description": "Gulp starter with common tasks and scenarios",
+  "description": "Angular module of impress.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/pBun/gulp-starter.git"
+    "url": "git://github.com/pBun/ngImpress.git"
   },
   "browser": {
 
