@@ -1,4 +1,4 @@
-ngImpress
+ngImpress (IN DEVELOPMENT AND NOT CURRENTLY WORKING)
 ============
 
 This is an angular module version of [impress.js](https://github.com/bartaz/impress.js/)
