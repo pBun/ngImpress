@@ -48,15 +48,16 @@ controller.$inject = ['$scope', 'Impress'];
 // but the event is triggered only if the step is different than
 // last entered step.
 controller.prototype.onStepEnter = function (step) {
+    var $step = angular.element(step);
     if (this.scope.lastEntered !== step) {
 
         // update classes
-        step.removeClass("past");
-        step.removeClass("future");
-        step.addClass("present");
+        $step.removeClass("past");
+        $step.removeClass("future");
+        $step.addClass("present");
 
         // update hash
-        window.location.hash = this.scope.lastHash = "#/" + step.id;
+        // window.location.hash = this.scope.lastHash = "#/" + step.id;
 
         this.scope.lastEntered = step;
     }
@@ -66,9 +67,10 @@ controller.prototype.onStepEnter = function (step) {
 // but the event is triggered only if the step is the same as
 // last entered step.
 controller.prototype.onStepLeave = function (step) {
+    var $step = angular.element(step);
     if (this.scope.lastEntered === step) {
-        step.removeClass("present");
-        step.addClass("past");
+        $step.removeClass("present");
+        $step.addClass("past");
         this.scope.lastEntered = null;
     }
 };
@@ -98,12 +100,12 @@ controller.prototype.initStep = function ( el, idx ) {
 
     this.scope.stepsData["impress-" + el.id] = step;
 
-    css(el, {
+    this.impress.css(el, {
         position: "absolute",
         transform: "translate(-50%,-50%)" +
-                   translate(step.translate) +
-                   rotate(step.rotate) +
-                   scale(step.scale),
+                   this.impress.translate(step.translate) +
+                   this.impress.rotate(step.rotate) +
+                   this.impress.scale(step.scale),
         transformStyle: "preserve-3d"
     });
 };
@@ -137,13 +139,13 @@ controller.prototype.init = function () {
     // wrap steps with "this.scope.canvas" element
     this.impress.arrayify( this.scope.root.childNodes ).forEach(function ( el ) {
         this.scope.canvas.appendChild( el );
-    });
+    }.bind(this));
     this.scope.root.appendChild(this.scope.canvas);
 
     // set initial styles
     document.documentElement.style.height = "100%";
 
-    css(body, {
+    this.impress.css(this.scope.root, {
         height: "100%",
         overflow: "hidden"
     });
@@ -155,20 +157,20 @@ controller.prototype.init = function () {
         transformStyle: "preserve-3d"
     };
 
-    css(this.scope.root, rootStyles);
-    css(this.scope.root, {
+    this.impress.css(this.scope.root, rootStyles);
+    this.impress.css(this.scope.root, {
         top: "50%",
         left: "50%",
-        transform: perspective( this.scope.config.perspective/this.scope.windowScale ) + scale( this.scope.windowScale )
+        transform: this.impress.perspective( this.scope.config.perspective/this.scope.windowScale ) + this.impress.scale( this.scope.windowScale )
     });
-    css(this.scope.canvas, rootStyles);
+    this.impress.css(this.scope.canvas, rootStyles);
 
-    body.classList.remove("impress-disabled");
-    body.classList.add("impress-enabled");
+    this.scope.root.classList.remove("impress-disabled");
+    this.scope.root.classList.add("impress-enabled");
 
     // get and init steps
     this.scope.steps = this.impress.$$(".step", this.scope.root);
-    this.scope.steps.forEach( initStep );
+    this.scope.steps.forEach( this.initStep.bind(this) );
 
     // set a default initial state of the this.scope.canvas
     this.scope.currentState = {
@@ -206,14 +208,14 @@ controller.prototype.getStep = function ( step ) {
 // with a transition `duration` optionally given as second parameter.
 controller.prototype.goto = function ( el, duration ) {
 
-    if ( !this.scope.initialized || !(el = getStep(el)) ) {
+    if ( !this.scope.initialized || !(el = this.getStep(el)) ) {
         // presentation not this.scope.initialized or given element is not a step
         return false;
     }
 
     // Sometimes it's possible to trigger focus on first link with some keyboard action.
     // Browser in such a case tries to scroll the page to make this element visible
-    // (even that body overflow is set to hidden) and it breaks our careful positioning.
+    // (even that this.scope.root overflow is set to hidden) and it breaks our careful positioning.
     //
     // So, as a lousy (and lazy) workaround we will make the page scroll back to the top
     // whenever slide is selected
@@ -225,11 +227,11 @@ controller.prototype.goto = function ( el, duration ) {
 
     if ( this.scope.activeStep ) {
         this.scope.activeStep.classList.remove("active");
-        body.classList.remove("impress-on-" + this.scope.activeStep.id);
+        this.scope.root.classList.remove("impress-on-" + this.scope.activeStep.id);
     }
     el.classList.add("active");
 
-    body.classList.add("impress-on-" + el.id);
+    this.scope.root.classList.add("impress-on-" + el.id);
 
     // compute target state of the this.scope.canvas based on given step
     var target = {
@@ -267,7 +269,7 @@ controller.prototype.goto = function ( el, duration ) {
 
     // trigger leave of currently active element (if it's not the same step again)
     if (this.scope.activeStep && this.scope.activeStep !== el) {
-        onStepLeave(this.scope.activeStep);
+        this.onStepLeave(this.scope.activeStep);
     }
 
     // Now we alter transforms of `this.scope.root` and `this.scope.canvas` to trigger transitions.
@@ -278,16 +280,16 @@ controller.prototype.goto = function ( el, duration ) {
     // Transitions on them are triggered with different delays (to make
     // visually nice and 'natural' looking transitions), so we need to know
     // that both of them are finished.
-    css(this.scope.root, {
+    this.impress.css(this.scope.root, {
         // to keep the perspective look similar for different scales
         // we need to 'scale' the perspective, too
-        transform: perspective( this.scope.config.perspective / targetScale ) + scale( targetScale ),
+        transform: this.impress.perspective( this.scope.config.perspective / targetScale ) + this.impress.scale( targetScale ),
         transitionDuration: duration + "ms",
         transitionDelay: (zoomin ? delay : 0) + "ms"
     });
 
-    css(this.scope.canvas, {
-        transform: rotate(target.rotate, true) + translate(target.translate),
+    this.impress.css(this.scope.canvas, {
+        transform: this.impress.rotate(target.rotate, true) + this.impress.translate(target.translate),
         transitionDuration: duration + "ms",
         transitionDelay: (zoomin ? 0 : delay) + "ms"
     });
@@ -327,7 +329,7 @@ controller.prototype.goto = function ( el, duration ) {
     window.clearTimeout(this.scope.stepEnterTimeout);
     this.scope.stepEnterTimeout = window.setTimeout(function() {
         this.onStepEnter(this.scope.activeStep);
-    }, duration + delay);
+    }.bind(this), duration + delay);
 
     return el;
 };
