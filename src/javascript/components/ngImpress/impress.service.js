@@ -90,7 +90,7 @@ service.prototype.css = function ( el, props ) {
     var key, pkey;
     for ( key in props ) {
         if ( props.hasOwnProperty(key) ) {
-            pkey = pfx(key);
+            pkey = this.pfx(key);
             if ( pkey !== null ) {
                 el.style[pkey] = props[key];
             }
