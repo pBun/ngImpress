@@ -147,7 +147,7 @@ controller.prototype.init = function () {
 
     this.impress.css(this.scope.root, {
         height: "100%",
-        overflow: "hidden"
+        // overflow: "hidden"
     });
 
     var rootStyles = {
