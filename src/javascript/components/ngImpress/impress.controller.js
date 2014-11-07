@@ -57,7 +57,7 @@ controller.prototype.onStepEnter = function (step) {
         $step.addClass("present");
 
         // update hash
-        // window.location.hash = this.scope.lastHash = "#/" + step.id;
+        window.location.hash = this.scope.lastHash = "#/" + step.id;
 
         this.scope.lastEntered = step;
     }
