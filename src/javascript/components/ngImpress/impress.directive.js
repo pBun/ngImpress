@@ -23,6 +23,9 @@ var directive = function($window, Impress) {
         element.addClass(directive.SUPPORTED_CLASS);
       }
 
+      // initialize
+      api.init();
+
       // Bind events
 
       // Prevent default keydown action when one of supported key is pressed.
@@ -154,8 +157,6 @@ var directive = function($window, Impress) {
       scope.$on('$destroy', function() {
         angular.element($window).off('hashchange', onHashChange);
       });
-
-      api.init();
 
 
     },
