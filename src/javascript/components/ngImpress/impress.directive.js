@@ -10,8 +10,8 @@ var directive = function($window, Impress) {
     controller: controller,
     link: function(scope, element, attrs, api) {
 
-      scope.element = element;
-      scope.root = element[0];
+      api.element = element;
+      api.root = element[0];
 
       // Check support
       var impressSupported = Impress.checkSupport();
@@ -142,14 +142,14 @@ var directive = function($window, Impress) {
 
       // Adding hash change support.
       // last hash detected
-      scope.lastHash = "";
+      api.lastHash = "";
       var onHashChange = function () {
           // When the step is entered hash in the location is updated
           // (just few lines above from here), so the hash change is
           // triggered and we would call `goto` again on the same element.
           //
           // To avoid this we store last entered hash and compare.
-          if (window.location.hash !== scope.lastHash) {
+          if (window.location.hash !== api.lastHash) {
               api.goto( Impress.getElementFromHash() );
           }
       };
