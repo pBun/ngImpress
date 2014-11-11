@@ -13,6 +13,9 @@ var directive = function($window, Impress) {
       scope.element = element;
       scope.root = element[0];
 
+      // Remove focus outline (huge performance issues and it looks weird)
+      element[0].style.outline = 0;
+
       // Check support
       var impressSupported = Impress.checkSupport();
       if (!impressSupported) {
