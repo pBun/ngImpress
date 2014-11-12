@@ -16,7 +16,7 @@ var controller = function($scope, Impress) {
   this.scope.currentState = null;
 
   // array of step elements
-  this.scope.steps = null;
+  this.scope.steps = [];
 
   // scale factor of the browser window
   this.scope.windowScale = null;
@@ -74,7 +74,8 @@ controller.prototype.onStepLeave = function(step) {
 
 // `initStep` initializes given step element by reading data from its
 // data attributes and setting correct styles.
-controller.prototype.initStep = function(el, idx) {
+controller.prototype.initStep = function(element) {
+  var el = element[0];
   var data = el.dataset,
     step = {
       translate: {
@@ -91,8 +92,14 @@ controller.prototype.initStep = function(el, idx) {
       el: el
     };
 
+  // add to steps array
+  this.scope.steps.push(el);
+
+  // increment index number and add id if not provided
+  this.scope.nextStepIndex = typeof this.scope.nextStepIndex === 'number' ?
+    this.scope.nextStepIndex + 1 : 0;
   if (!el.id) {
-    el.id = "step-" + (idx + 1);
+    el.id = "step-" + this.scope.nextStepIndex;
   }
 
   this.scope.stepsData["impress-" + el.id] = step;
@@ -162,10 +169,6 @@ controller.prototype.init = function() {
 
   this.scope.root.classList.remove("impress-disabled");
   this.scope.root.classList.add("impress-enabled");
-
-  // get and init steps
-  this.scope.steps = this.impress.$$(".step", this.scope.root);
-  this.scope.steps.forEach(this.initStep.bind(this));
 
   // set a default initial state of the this.scope.canvas
   this.scope.currentState = {

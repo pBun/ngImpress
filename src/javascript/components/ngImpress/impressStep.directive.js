@@ -16,6 +16,8 @@ var directive = function($window) {
     },
     link: function(scope, element, attrs, api) {
 
+      api.initStep(element);
+
       // delegated handler for clicking on step elements
       element.on("click", function(event) {
         if (api.goto(this)) {
