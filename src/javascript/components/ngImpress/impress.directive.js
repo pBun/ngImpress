@@ -99,20 +99,6 @@ var directive = function($window, Impress) {
         }
       });
 
-      // delegated handler for clicking on step elements
-      element.on("click", function(event) {
-        var target = event.target;
-        // find closest step element that is not active
-        while (!(target.classList.contains("step") && !target.classList.contains("active")) &&
-          (target !== document.documentElement)) {
-          target = target.parentNode;
-        }
-
-        if (api.goto(target)) {
-          event.preventDefault();
-        }
-      });
-
       // touch handler to detect taps on the left and right side of the screen
       // based on awesome work of @hakimel: https://github.com/hakimel/reveal.js
       element.on("touchstart", function(event) {

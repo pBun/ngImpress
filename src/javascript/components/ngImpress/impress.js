@@ -1,7 +1,7 @@
 var angular = require('angular');
 var ImpressService = require('./impress.service');
 var ImpressDirective = require('./impress.directive');
-var ImpressSlideDirective = require('./impressSlide.directive');
+var ImpressSlideDirective = require('./impressStep.directive');
 
 var component = angular.module('ngImpress', []);
 component.service('Impress', ImpressService);
