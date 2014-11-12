@@ -5,7 +5,13 @@ var directive = function($window, Impress) {
   return {
     restrict: 'EA',
     scope: {
-      'rootId': '=?id'
+      'rootId': '=?id',
+      'width': '=?',
+      'height': '=?',
+      'maxScale': '=?',
+      'minScale': '=?',
+      'perspective': '=?',
+      'transitionDuration': '=?'
     },
     controller: controller,
     link: function(scope, element, attrs, api) {

@@ -18,9 +18,6 @@ var controller = function($scope, Impress) {
   // array of step elements
   this.scope.steps = null;
 
-  // this.scope.configuration options
-  this.scope.config = null;
-
   // scale factor of the browser window
   this.scope.windowScale = null;
 
@@ -125,18 +122,14 @@ controller.prototype.init = function() {
     document.head.appendChild(meta);
   }
 
-  // initialize this.scope.configuration object
-  var rootData = this.scope.root.dataset;
-  this.scope.config = {
-    width: this.impress.toNumber(rootData.width, this.impress.defaults.width),
-    height: this.impress.toNumber(rootData.height, this.impress.defaults.height),
-    maxScale: this.impress.toNumber(rootData.maxScale, this.impress.defaults.maxScale),
-    minScale: this.impress.toNumber(rootData.minScale, this.impress.defaults.minScale),
-    perspective: this.impress.toNumber(rootData.perspective, this.impress.defaults.perspective),
-    transitionDuration: this.impress.toNumber(rootData.transitionDuration, this.impress.defaults.transitionDuration)
-  };
-
-  this.scope.windowScale = this.impress.computeWindowScale(this.scope.config);
+  // initialize this.scopeuration object
+  this.scope.width = this.scope.width || this.impress.defaults.width;
+  this.scope.height = this.scope.height || this.impress.defaults.height;
+  this.scope.maxScale = this.scope.maxScale || this.impress.defaults.maxScale;
+  this.scope.minScale = this.scope.minScale || this.impress.defaults.minScale;
+  this.scope.perspective = this.scope.perspective || this.impress.defaults.perspective;
+  this.scope.transitionDuration = this.scope.transitionDuration || this.impress.defaults.transitionDuration;
+  this.scope.windowScale = this.impress.computeWindowScale(this.scope);
 
   // wrap steps with "this.scope.canvas" element
   this.impress.arrayify(this.scope.root.childNodes).forEach(function(el) {
@@ -163,7 +156,7 @@ controller.prototype.init = function() {
   this.impress.css(this.scope.root, {
     top: "50%",
     left: "50%",
-    transform: this.impress.perspective(this.scope.config.perspective / this.scope.windowScale) + this.impress.scale(this.scope.windowScale)
+    transform: this.impress.perspective(this.scope.perspective / this.scope.windowScale) + this.impress.scale(this.scope.windowScale)
   });
   this.impress.css(this.scope.canvas, rootStyles);
 
@@ -266,13 +259,13 @@ controller.prototype.goto = function(el, duration) {
   // with scaling down and move and rotation are delayed.
   var zoomin = target.scale >= this.scope.currentState.scale;
 
-  duration = this.impress.toNumber(duration, this.scope.config.transitionDuration);
+  duration = this.impress.toNumber(duration, this.scope.transitionDuration);
   var delay = (duration / 2);
 
   // if the same step is re-selected, force computing window scaling,
   // because it is likely to be caused by window resize
   if (el === this.scope.activeStep) {
-    this.scope.windowScale = this.impress.computeWindowScale(this.scope.config);
+    this.scope.windowScale = this.impress.computeWindowScale(this.scope);
   }
 
   var targetScale = target.scale * this.scope.windowScale;
@@ -293,7 +286,7 @@ controller.prototype.goto = function(el, duration) {
   this.impress.css(this.scope.root, {
     // to keep the perspective look similar for different scales
     // we need to 'scale' the perspective, too
-    transform: this.impress.perspective(this.scope.config.perspective / targetScale) + this.impress.scale(targetScale),
+    transform: this.impress.perspective(this.scope.perspective / targetScale) + this.impress.scale(targetScale),
     transitionDuration: duration + "ms",
     transitionDelay: (zoomin ? delay : 0) + "ms"
   });
