@@ -52,10 +52,6 @@ module.exports = {
       entries: src + '/javascript/app.js',
       dest: dest,
       outputName: 'app.js'
-    }, {
-      entries: src + '/javascript/head.js',
-      dest: dest,
-      outputName: 'head.js'
     }]
   }
 };
