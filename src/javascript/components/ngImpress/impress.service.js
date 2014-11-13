@@ -106,21 +106,6 @@ service.prototype.$ = function(selector, context) {
   return context.querySelector(selector);
 };
 
-// `$$` return an array of elements for given CSS `selector` in the `context` of
-// the given element or whole document.
-service.prototype.$$ = function(selector, context) {
-  context = context || document;
-  return this.arrayify(context.querySelectorAll(selector));
-};
-
-// `triggerEvent` builds a custom DOM event with given `eventName` and `detail` data
-// and triggers it on element given as `el`.
-service.prototype.triggerEvent = function(el, eventName, detail) {
-  var event = document.createEvent("CustomEvent");
-  event.initCustomEvent(eventName, true, true, detail);
-  el.dispatchEvent(event);
-};
-
 // `translate` builds a translate transform string for given data.
 service.prototype.translate = function(t) {
   return " translate3d(" + t.x + "px," + t.y + "px," + t.z + "px) ";
