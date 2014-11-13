@@ -167,8 +167,8 @@ controller.prototype.init = function() {
   });
   this.impress.css(this.scope.canvas, rootStyles);
 
-  this.scope.root.classList.remove("impress-disabled");
-  this.scope.root.classList.add("impress-enabled");
+  this.scope.element.removeClass("impress-disabled");
+  this.scope.element.addClass("impress-enabled");
 
   // set a default initial state of the this.scope.canvas
   this.scope.currentState = {
@@ -226,11 +226,11 @@ controller.prototype.goto = function(step, duration) {
 
   if (this.scope.activeStep) {
     this.scope.activeStep.el.classList.remove("active");
-    this.scope.root.classList.remove("impress-on-" + this.scope.activeStep.el.id);
+    this.scope.element.removeClass("impress-on-" + this.scope.activeStep.el.id);
   }
   step.el.classList.add("active");
 
-  this.scope.root.classList.add("impress-on-" + step.el.id);
+  this.scope.element.addClass("impress-on-" + step.el.id);
 
   // compute target state of the this.scope.canvas based on given step
   var target = {
