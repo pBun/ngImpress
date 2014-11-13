@@ -74,21 +74,20 @@ controller.prototype.onStepLeave = function(step) {
 
 // `initStep` initializes given step element by reading data from its
 // data attributes and setting correct styles.
-controller.prototype.initStep = function(element) {
-  var el = element[0];
-  var data = el.dataset,
+controller.prototype.initStep = function(stepScope) {
+  var el = stepScope.el[0];
     step = {
       translate: {
-        x: this.impress.toNumber(data.x),
-        y: this.impress.toNumber(data.y),
-        z: this.impress.toNumber(data.z)
+        x: stepScope.x || 0,
+        y: stepScope.y || 0,
+        z: stepScope.z || 0
       },
       rotate: {
-        x: this.impress.toNumber(data.rotateX),
-        y: this.impress.toNumber(data.rotateY),
-        z: this.impress.toNumber(data.rotateZ || data.rotate)
+        x: stepScope.rotateX || 0,
+        y: stepScope.rotateY || 0,
+        z: stepScope.rotateZ || stepScope.rotate || 0
       },
-      scale: this.impress.toNumber(data.scale, 1),
+      scale: stepScope.scale || 1,
       el: el
     };
 
@@ -96,9 +95,9 @@ controller.prototype.initStep = function(element) {
   this.scope.steps.push(el);
 
   // increment index number and add id if not provided
-  this.scope.nextStepIndex = typeof this.scope.nextStepIndex === 'number' ?
-    this.scope.nextStepIndex + 1 : 0;
   if (!el.id) {
+    this.scope.nextStepIndex = typeof this.scope.nextStepIndex === 'number' ?
+      this.scope.nextStepIndex + 1 : 0;
     el.id = "step-" + this.scope.nextStepIndex;
   }
 
