@@ -104,8 +104,6 @@ controller.prototype.initStep = function(stepScope) {
     // Init all steps with 'future' class
     el.classList.add("future");
 
-    // move to canvas wrapper
-    this.scope.canvas.appendChild(el);
   }
 
   this.impress.css(el, {
@@ -204,7 +202,7 @@ controller.prototype.getStep = function(step) {
   } else if (typeof step === "string") {
     step = this.getById(step);
   }
-  return (step && step.el.id && step.styleData) ? step : null;
+  return (step && step.el && step.styleData) ? step : null;
 };
 
 // `goto` API function that moves to step given with `el` parameter (by index, id or element),
@@ -363,7 +361,6 @@ controller.prototype.getById = function(id) {
 
 // Prevent default keydown action when one of supported key is pressed.
 controller.prototype.onKeydown = function(event) {
-  console.log(1);
   if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34) || (event.keyCode >= 37 && event.keyCode <= 40)) {
     event.preventDefault();
   }
@@ -385,7 +382,6 @@ controller.prototype.onKeydown = function(event) {
 //   as another way to moving to next step... And yes, I know that for the sake of
 //   consistency I should add [shift+tab] as opposite action...
 controller.prototype.onKeyup = function(event) {
-  console.log(2);
   if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34) || (event.keyCode >= 37 && event.keyCode <= 40)) {
     switch (event.keyCode) {
       case 33: // pg up
@@ -408,7 +404,6 @@ controller.prototype.onKeyup = function(event) {
 
 // delegated handler for clicking on the links to presentation steps
 controller.prototype.onClick = function(event) {
-  console.log(3);
   // event delegation with "bubbling"
   // check if event target (or any of its parents is a link)
   var target = event.target;
@@ -435,7 +430,6 @@ controller.prototype.onClick = function(event) {
 // touch handler to detect taps on the left and right side of the screen
 // based on awesome work of @hakimel: https://github.com/hakimel/reveal.js
 controller.prototype.onTouchstart = function(event) {
-  console.log(4);
   if (event.touches.length === 1) {
     var x = event.touches[0].clientX,
       width = window.innerWidth * 0.3,
@@ -455,7 +449,6 @@ controller.prototype.onTouchstart = function(event) {
 
 // rescale presentation when window is resized
 controller.prototype.onWindowResize = function() {
-  console.log(5);
   // force going to active step again, to trigger rescaling
   this.goto(this.scope.activeStep, 500);
 };
@@ -463,7 +456,6 @@ controller.prototype.onWindowResize = function() {
 // Adding hash change support.
 // last hash detected
 controller.prototype.onHashChange = function() {
-  console.log(6);
   // When the step is entered hash in the location is updated
   // (just few lines above from here), so the hash change is
   // triggered and we would call `goto` again on the same element.
