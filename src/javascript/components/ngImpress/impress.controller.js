@@ -45,7 +45,7 @@ controller.$inject = ['$scope', 'Impress'];
 // but the event is triggered only if the step is different than
 // last entered step.
 controller.prototype.onStepEnter = function(step) {
-  var $step = angular.element(step);
+  var $step = angular.element(step.el);
   if (this.scope.lastEntered !== step) {
 
     // update classes
@@ -54,7 +54,7 @@ controller.prototype.onStepEnter = function(step) {
     $step.addClass("present");
 
     // update hash
-    window.location.hash = this.scope.lastHash = "#/" + step.id;
+    window.location.hash = this.scope.lastHash = "#/" + step.el.id;
 
     this.scope.lastEntered = step;
   }
@@ -64,7 +64,7 @@ controller.prototype.onStepEnter = function(step) {
 // but the event is triggered only if the step is the same as
 // last entered step.
 controller.prototype.onStepLeave = function(step) {
-  var $step = angular.element(step);
+  var $step = angular.element(step.el);
   if (this.scope.lastEntered === step) {
     $step.removeClass("present");
     $step.addClass("past");
@@ -75,24 +75,20 @@ controller.prototype.onStepLeave = function(step) {
 // `initStep` initializes given step element by reading data from its
 // data attributes and setting correct styles.
 controller.prototype.initStep = function(stepScope) {
-  var el = stepScope.el[0];
-    step = {
-      translate: {
-        x: stepScope.x || 0,
-        y: stepScope.y || 0,
-        z: stepScope.z || 0
-      },
-      rotate: {
-        x: stepScope.rotateX || 0,
-        y: stepScope.rotateY || 0,
-        z: stepScope.rotateZ || stepScope.rotate || 0
-      },
-      scale: stepScope.scale || 1,
-      el: el
-    };
-
-  // add to steps array
-  this.scope.steps.push(el);
+  var el = stepScope.el;
+  var step = stepScope.styleData = {
+    translate: {
+      x: stepScope.x || 0,
+      y: stepScope.y || 0,
+      z: stepScope.z || 0
+    },
+    rotate: {
+      x: stepScope.rotateX || 0,
+      y: stepScope.rotateY || 0,
+      z: stepScope.rotateZ || stepScope.rotate || 0
+    },
+    scale: stepScope.scale || 1
+  };
 
   // increment index number and add id if not provided
   if (!el.id) {
@@ -101,7 +97,16 @@ controller.prototype.initStep = function(stepScope) {
     el.id = "step-" + this.scope.nextStepIndex;
   }
 
-  this.scope.stepsData["impress-" + el.id] = step;
+  if (!stepScope.stepIndex) {
+    stepScope.stepIndex = this.scope.steps.length;
+    this.scope.steps.push(stepScope);
+
+    // Init all steps with 'future' class
+    el.classList.add("future");
+
+    // move to canvas wrapper
+    this.scope.canvas.appendChild(el);
+  }
 
   this.impress.css(el, {
     position: "absolute",
@@ -144,8 +149,6 @@ controller.prototype.init = function() {
   this.scope.root.appendChild(this.scope.canvas);
 
   // set initial styles
-  document.documentElement.style.height = "100%";
-
   this.impress.css(this.scope.root, {
     height: "100%",
     // overflow: "hidden"
@@ -186,14 +189,9 @@ controller.prototype.init = function() {
 
   this.scope.initialized = true;
 
-  // Init all steps with 'future' class
-  this.scope.steps.forEach(function(step) {
-    step.classList.add("future");
-  });
-
   // START
   // by selecting step defined in url or first step of the presentation
-  this.goto(this.impress.getElementFromHash() || this.scope.steps[0], 0);
+  this.goto(this.getById(this.impress.getHash()) || this.scope.steps[0], 0);
 };
 
 // `getStep` is a helper function that returns a step element defined by parameter.
@@ -204,16 +202,16 @@ controller.prototype.getStep = function(step) {
   if (typeof step === "number") {
     step = step < 0 ? this.scope.steps[this.scope.steps.length + step] : this.scope.steps[step];
   } else if (typeof step === "string") {
-    step = byId(step);
+    step = this.getById(step);
   }
-  return (step && step.id && this.scope.stepsData["impress-" + step.id]) ? step : null;
+  return (step && step.el.id && step.styleData) ? step : null;
 };
 
 // `goto` API function that moves to step given with `el` parameter (by index, id or element),
 // with a transition `duration` optionally given as second parameter.
-controller.prototype.goto = function(el, duration) {
+controller.prototype.goto = function(step, duration) {
 
-  if (!this.scope.initialized || !(el = this.getStep(el))) {
+  if (!this.scope.initialized || !(step = this.getStep(step))) {
     // presentation not this.scope.initialized or given element is not a step
     return false;
   }
@@ -228,29 +226,27 @@ controller.prototype.goto = function(el, duration) {
   // If you are reading this and know any better way to handle it, I'll be glad to hear about it!
   window.scrollTo(0, 0);
 
-  var step = this.scope.stepsData["impress-" + el.id];
-
   if (this.scope.activeStep) {
-    this.scope.activeStep.classList.remove("active");
-    this.scope.root.classList.remove("impress-on-" + this.scope.activeStep.id);
+    this.scope.activeStep.el.classList.remove("active");
+    this.scope.root.classList.remove("impress-on-" + this.scope.activeStep.el.id);
   }
-  el.classList.add("active");
+  step.el.classList.add("active");
 
-  this.scope.root.classList.add("impress-on-" + el.id);
+  this.scope.root.classList.add("impress-on-" + step.el.id);
 
   // compute target state of the this.scope.canvas based on given step
   var target = {
     rotate: {
-      x: -step.rotate.x,
-      y: -step.rotate.y,
-      z: -step.rotate.z
+      x: -step.styleData.rotate.x,
+      y: -step.styleData.rotate.y,
+      z: -step.styleData.rotate.z
     },
     translate: {
-      x: -step.translate.x,
-      y: -step.translate.y,
-      z: -step.translate.z
+      x: -step.styleData.translate.x,
+      y: -step.styleData.translate.y,
+      z: -step.styleData.translate.z
     },
-    scale: 1 / step.scale
+    scale: 1 / step.styleData.scale
   };
 
   // Check if the transition is zooming in or not.
@@ -261,19 +257,19 @@ controller.prototype.goto = function(el, duration) {
   // with scaling down and move and rotation are delayed.
   var zoomin = target.scale >= this.scope.currentState.scale;
 
-  duration = this.impress.toNumber(duration, this.scope.transitionDuration);
+  duration = typeof duration === 'number' ? duration : this.scope.transitionDuration;
   var delay = (duration / 2);
 
   // if the same step is re-selected, force computing window scaling,
   // because it is likely to be caused by window resize
-  if (el === this.scope.activeStep) {
+  if (step === this.scope.activeStep) {
     this.scope.windowScale = this.impress.computeWindowScale(this.scope);
   }
 
   var targetScale = target.scale * this.scope.windowScale;
 
   // trigger leave of currently active element (if it's not the same step again)
-  if (this.scope.activeStep && this.scope.activeStep !== el) {
+  if (this.scope.activeStep && this.scope.activeStep !== step) {
     this.onStepLeave(this.scope.activeStep);
   }
 
@@ -317,7 +313,7 @@ controller.prototype.goto = function(el, duration) {
 
   // store current state
   this.scope.currentState = target;
-  this.scope.activeStep = el;
+  this.scope.activeStep = step;
 
   // And here is where we trigger `impress:stepenter` event.
   // We simply set up a timeout to fire it taking transition duration (and possible delay) into account.
@@ -336,7 +332,7 @@ controller.prototype.goto = function(el, duration) {
     this.onStepEnter(this.scope.activeStep);
   }.bind(this), duration + delay);
 
-  return el;
+  return step;
 };
 
 // `prev` API function goes to previous step (in document order)
@@ -355,8 +351,19 @@ controller.prototype.next = function() {
   return this.goto(next);
 };
 
+controller.prototype.getById = function(id) {
+  var stepToReturn = null;
+  this.scope.steps.forEach(function(step) {
+    if (id === step.el.id) {
+      stepToReturn = step;
+    }
+  });
+  return stepToReturn;
+};
+
 // Prevent default keydown action when one of supported key is pressed.
 controller.prototype.onKeydown = function(event) {
+  console.log(1);
   if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34) || (event.keyCode >= 37 && event.keyCode <= 40)) {
     event.preventDefault();
   }
@@ -378,6 +385,7 @@ controller.prototype.onKeydown = function(event) {
 //   as another way to moving to next step... And yes, I know that for the sake of
 //   consistency I should add [shift+tab] as opposite action...
 controller.prototype.onKeyup = function(event) {
+  console.log(2);
   if (event.keyCode === 9 || (event.keyCode >= 32 && event.keyCode <= 34) || (event.keyCode >= 37 && event.keyCode <= 40)) {
     switch (event.keyCode) {
       case 33: // pg up
@@ -400,6 +408,7 @@ controller.prototype.onKeyup = function(event) {
 
 // delegated handler for clicking on the links to presentation steps
 controller.prototype.onClick = function(event) {
+  console.log(3);
   // event delegation with "bubbling"
   // check if event target (or any of its parents is a link)
   var target = event.target;
@@ -413,7 +422,7 @@ controller.prototype.onClick = function(event) {
 
     // if it's a link to presentation step, target this step
     if (href && href[0] === '#') {
-      target = document.getElementById(href.slice(1));
+      target = this.getById(href.slice(1));
     }
   }
 
@@ -426,6 +435,7 @@ controller.prototype.onClick = function(event) {
 // touch handler to detect taps on the left and right side of the screen
 // based on awesome work of @hakimel: https://github.com/hakimel/reveal.js
 controller.prototype.onTouchstart = function(event) {
+  console.log(4);
   if (event.touches.length === 1) {
     var x = event.touches[0].clientX,
       width = window.innerWidth * 0.3,
@@ -445,20 +455,22 @@ controller.prototype.onTouchstart = function(event) {
 
 // rescale presentation when window is resized
 controller.prototype.onWindowResize = function() {
+  console.log(5);
   // force going to active step again, to trigger rescaling
-  this.goto(document.querySelector(".step.active"), 500);
+  this.goto(this.scope.activeStep, 500);
 };
 
 // Adding hash change support.
 // last hash detected
 controller.prototype.onHashChange = function() {
+  console.log(6);
   // When the step is entered hash in the location is updated
   // (just few lines above from here), so the hash change is
   // triggered and we would call `goto` again on the same element.
   //
   // To avoid this we store last entered hash and compare.
   if (window.location.hash !== this.scope.lastHash) {
-    this.goto(Impress.getElementFromHash());
+    this.goto(this.impress.getHash());
   }
 };
 

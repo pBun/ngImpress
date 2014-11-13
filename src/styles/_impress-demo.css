@@ -81,9 +81,13 @@ table {
     And yes, there is a lot of repetition there because of -prefixes but we don't
     want to leave anybody behind.
 */
+html {
+    height: 100%;
+}
 body {
     font-family: 'PT Sans', sans-serif;
     min-height: 740px;
+    height: 100%;
     overflow: hidden;
 
     background: rgb(215, 215, 215);

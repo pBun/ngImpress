@@ -99,18 +99,6 @@ service.prototype.css = function(el, props) {
   return el;
 };
 
-// `toNumber` takes a value given as `numeric` parameter and tries to turn
-// it into a number. If it is not possible it returns 0 (or other value
-// given as `fallback`).
-service.prototype.toNumber = function(numeric, fallback) {
-  return isNaN(numeric) ? (fallback || 0) : Number(numeric);
-};
-
-// `byId` returns element with given `id` - you probably have guessed that ;)
-service.prototype.byId = function(id) {
-  return document.getElementById(id);
-};
-
 // `$` returns first element for given CSS `selector` in the `context` of
 // the given element or whole document.
 service.prototype.$ = function(selector, context) {
@@ -161,10 +149,10 @@ service.prototype.perspective = function(p) {
 
 // `getElementFromHash` returns an element located by id from hash part of
 // window location.
-service.prototype.getElementFromHash = function() {
+service.prototype.getHash = function() {
   // get id from url # by removing `#` or `#/` from the beginning,
   // so both "fallback" `#slide-id` and "enhanced" `#/slide-id` will work
-  return this.byId(window.location.hash.replace(/^#\/?/, ""));
+  return window.location.hash.replace(/^#\/?/, "");
 };
 
 // `computeWindowScale` counts the scale factor between window size and size

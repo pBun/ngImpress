@@ -16,13 +16,13 @@ var directive = function($window) {
     },
     link: function(scope, element, attrs, api) {
 
-      scope.el = element;
+      scope.el = element[0];
 
       api.initStep(scope);
 
       // delegated handler for clicking on step elements
       element.on("click", function(event) {
-        if (api.goto(this)) {
+        if (api.goto(scope)) {
           event.preventDefault();
         }
       });
